@@ -69,7 +69,8 @@ function initBeatmap()
 	-- this is the length of a single bar in ms
 	barLength = quarter_note * 4
 
-	-- fill a bar with values
+for i=1,10 do
+		-- fill a bar with values
 	newBar = {}
  	local quarter1 = newNote(true, quarter_note, 0)
  	local quarter2 = newNote(true, quarter_note, 0 + quarter_note)
@@ -96,10 +97,12 @@ function initBeatmap()
 	else -- bar wasn't added sucessfully
 		print("fail")
 	end  
+end
+
 end 
 
 function newNote(_play, _duration, _position)
-	return {play = _play, duration = _duration, position = _position}
+	return {play = _play, duration = _duration, position = _position, y = 0}
 end 
 
 function addBeatmapBar(newBar)
@@ -151,9 +154,16 @@ function updateAudioManager()
 	return songTime
 end 
 
+function getSongTime()
+	return songTime + (love.timer.getTime()*1000) - previousFrameTime
+end
 
 function getCurrentBar()
 	return math.floor(bar)
+end 
+
+function getCurrentTimePositionInBar()
+	return ((bar - math.floor(bar)) * barLength) 
 end 
 
 function getPreviousBar()

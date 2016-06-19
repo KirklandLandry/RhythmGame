@@ -1,5 +1,36 @@
-input = {}
+keys = {}
 
+function love.keypressed(key)
+    if key == "escape" then
+        love.event.quit()
+    end
+
+    keys[key] = {down = true, time = getSongTime()} 
+
+    print(key)
+    --[[if key == "d" then 
+        input.dKeyDown = true
+    end ]]
+
+end
+
+function love.keyreleased(key)
+    --[[if key == "escape" then
+        love.event.quit()
+    end]]
+
+    keys[key] = {down = false, time = getSongTime()} 
+    --[[if key == "d" then 
+        input.dKeyDown = false
+    end ]]
+
+end
+
+function initKeys()
+    keys['d'] = {down = false, time = 0}
+end 
+
+--[[input = {}
 input.mouseDown = false
 
 input.aKeyDown = false
@@ -30,7 +61,7 @@ function input:Reset()
     input.eKeyDown = false
 end
 
-function input:UpdateInput()
+--[[function input:UpdateInput()
     if love.mouse.isDown(1) then 
         if input.mouseDown==false then 
             input.mouseDown=true
@@ -103,7 +134,5 @@ function input:UpdateInput()
         end 
     else input.eKeyDown=false end 
 end 
-
-
-
+]]
 

@@ -15,6 +15,7 @@ require "audioManager"
 
 function love.load()
 	initAudioManager("assets/testSong.wav")
+	initKeys()
 end
 
 
@@ -28,25 +29,41 @@ local hitBeatFour = false
 local globalRunning = false
 
 function love.update(dt)
+
+	if keys['d'].down then 
+		--print(keys['d'].time)
+		--print(songTime)
+		globalRunning = true 
+	end 
+
 	if globalRunning then 
 
 		local songTime = updateAudioManager()
 
+		if keys['d'].down then 
+			--print(keys['d'].time )
+			--print(songTime)
+		end 
+
 		local currentBar = getCurrentBar()
 		local currentBarInMs = getCurrentBar() * getBarLength() 
 
-		local offs = 10
+		local offs = 40
 
+		-- current bar starts at 0
 		if #beatmap >= currentBar + 1 then 
 			local noteToHit = 0
 			for i=1,#beatmap[currentBar + 1] do
 				noteToHit = beatmap[currentBar + 1][i].position
+
 				if songTime >= (currentBarInMs + noteToHit - offs) and songTime <= (currentBarInMs + noteToHit + offs) then 
-					print("hit")
-					playSfx()
-					radius = 100
+					if keys['d'].down and keys['d'].time >= (currentBarInMs + noteToHit - (offs* 2)) and keys['d'].time  <= (currentBarInMs + noteToHit + (offs* 2)) then 
+						print("hit")
+						playSfx()
+						radius = 100
+					end 
 				end 
-				print(songTime, currentBarInMs + noteToHit - offs, currentBarInMs + noteToHit, currentBarInMs + noteToHit + offs )
+				--print(songTime, currentBarInMs + noteToHit - offs, currentBarInMs + noteToHit, currentBarInMs + noteToHit + offs )
 			end
 			
 		end 
@@ -101,22 +118,33 @@ end
 function love.draw()
 	audioManagerDebugPrint()
 
+	--[[if globalRunning then 
+		local currentBarInMs = getCurrentBar() * getBarLength() 
+		for i=1,#beatmap do
+			for j=1, #beatmap[i] do
+
+				if(beatmap[i][j].position == 0) then 
+					print(getSongTime() - ( ((i - 1) * getBarLength()) + beatmap[i][j].position))
+				end 
+
+				beatmap[i][j].y = (getSongTime() - (currentBarInMs + beatmap[i][j].position))
+				love.graphics.circle("line", love.graphics.getWidth() - (40 * j), beatmap[i][j].y, 10, 32)
+			end
+		end
+	end ]]
+
+	local xVal = (getCurrentTimePositionInBar() / getBarLength()) * love.graphics.getWidth()
+	print(xVal)
+	love.graphics.line(xVal, 0, xVal, love.graphics.getHeight())
+
+	love.graphics.line(0, love.graphics.getHeight()/2, love.graphics.getWidth(), love.graphics.getHeight()/2)
 	love.graphics.circle("fill", love.graphics.getWidth()/2, love.graphics.getHeight()/2, radius, 32)
 	--print(love.graphics.getWidth()/2, love.graphics.getHeight()/2, radius)
 
 end
 
 
-function love.keypressed(key)
-	if key == "escape" then
-		love.event.quit()
-	end
 
-	if key == "d" then 
-		globalRunning = true
-	end 
-
-end
 
 function getSign(x)
 	if x < 0 then
