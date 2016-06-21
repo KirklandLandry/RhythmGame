@@ -56,17 +56,19 @@ function love.update(dt)
 			local noteToHit = 0
 			for i=1,#beatmap[currentBar + 1] do
 				noteToHit = beatmap[currentBar + 1][i].songPosition
+
 		        --love.event.quit()
 				if songTime >= (currentBarInMs + noteToHit - offs) and songTime <= (currentBarInMs + noteToHit + offs) then 
 					
-					if keys[gameButtons.button3].down and keys[gameButtons.button3].time >= (currentBarInMs + noteToHit - (offs* 2)) and 
-						keys[gameButtons.button3].time  <= (currentBarInMs + noteToHit + (offs* 2)) and 
+					local currentButtonToPress = beatmap[currentBar + 1][i].buttonToPress
+					print(currentButtonToPress)
+					if keys[currentButtonToPress].down and keys[currentButtonToPress].time >= (currentBarInMs + noteToHit - (offs* 2)) and 
+						keys[currentButtonToPress].time  <= (currentBarInMs + noteToHit + (offs* 2)) and 
 						beatmap[currentBar + 1][i].hit == false then 
 
 						print("hit")
 						beatmap[currentBar + 1][i].hit = true 
 						playSfx()
-						radius = 100
 					end 
 				end 
 
@@ -81,8 +83,6 @@ function love.update(dt)
 			end
 		end 
 		
-		radius = radius - 10
-		if radius < 0 then radius = 0 end 
 
 	end 
 end
@@ -99,26 +99,42 @@ function love.draw()
 
 	local currentBar = getCurrentBar()
 	-- current bar starts at 0
+
+	local buttonHeights = {}
+	buttonHeights[gameButtons.button1] = (love.graphics.getHeight()/2) - 125
+	buttonHeights[gameButtons.button2] = (love.graphics.getHeight()/2) - 50
+	buttonHeights[gameButtons.button3] = (love.graphics.getHeight()/2) + 50
+	buttonHeights[gameButtons.button4] = (love.graphics.getHeight()/2) + 125
+
+
+
 	if #beatmap >= currentBar + 1 then 
 		for i=1,#beatmap[currentBar + 1] do
 			if beatmap[currentBar + 1][i].play then 
+
+				local currentButtonToPress = beatmap[currentBar + 1][i].buttonToPress
+				
 				if beatmap[currentBar + 1][i].hit then 
 					love.graphics.setColor(0,255,0,255)			
-					love.graphics.circle("fill", (beatmap[currentBar + 1][i].songPosition / getBarLength()) * love.graphics.getWidth(), love.graphics.getHeight()/2, 30, 32)
+					love.graphics.circle("fill", (beatmap[currentBar + 1][i].songPosition / getBarLength()) * love.graphics.getWidth(), buttonHeights[currentButtonToPress], 30, 32)
 				elseif beatmap[currentBar + 1][i].missed then 
 					love.graphics.setColor(255,0,0,255)			
-					love.graphics.circle("fill", (beatmap[currentBar + 1][i].songPosition / getBarLength()) * love.graphics.getWidth(), love.graphics.getHeight()/2, 30, 32)
+					love.graphics.circle("fill", (beatmap[currentBar + 1][i].songPosition / getBarLength()) * love.graphics.getWidth(), buttonHeights[currentButtonToPress], 30, 32)
 				else 
 					love.graphics.setColor(255,255,0,255)			
-					love.graphics.circle("fill", (beatmap[currentBar + 1][i].songPosition / getBarLength()) * love.graphics.getWidth(), love.graphics.getHeight()/2, 30, 32)
+					love.graphics.circle("fill", (beatmap[currentBar + 1][i].songPosition / getBarLength()) * love.graphics.getWidth(), buttonHeights[currentButtonToPress], 30, 32)
 				end 
 				love.graphics.setColor(255,255,255, 255)
 			end 
 		end
 	end 
 
-	love.graphics.line(0, love.graphics.getHeight()/2, love.graphics.getWidth(), love.graphics.getHeight()/2)
-	--love.graphics.circle("fill", love.graphics.getWidth()/2, love.graphics.getHeight()/2, radius, 32)
+
+	love.graphics.line(0, buttonHeights[gameButtons.button1], love.graphics.getWidth(), buttonHeights[gameButtons.button1])
+	love.graphics.line(0, buttonHeights[gameButtons.button2], love.graphics.getWidth(), buttonHeights[gameButtons.button2])
+	love.graphics.line(0, buttonHeights[gameButtons.button3], love.graphics.getWidth(), buttonHeights[gameButtons.button3])
+	love.graphics.line(0, buttonHeights[gameButtons.button4], love.graphics.getWidth(), buttonHeights[gameButtons.button4])
+
 end
 
 

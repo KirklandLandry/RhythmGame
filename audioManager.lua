@@ -70,18 +70,18 @@ function initBeatmap()
 	barLength = quarter_note * 4
 
 	emptyBar = {}
-	table.insert(emptyBar, newNote(false, quarter_note * 4, 0))
+	table.insert(emptyBar, newNote(false, gameButtons.button1, quarter_note * 4, 0))
 	addBeatmapBar(emptyBar)
 
 for i=1,10 do
 		-- fill a bar with values
 	local newBar = {}
- 	local quarter1 = newNote(true, quarter_note, 0)
- 	local quarter2 = newNote(true, quarter_note, 0 + quarter_note)
- 	local note3 = newNote(true, triplet_eighth_note, 0 + quarter_note + quarter_note)
- 	local note4 = newNote(true, triplet_eighth_note, 0 + quarter_note + quarter_note + triplet_eighth_note)
- 	local note5 = newNote(true, triplet_eighth_note, 0 + quarter_note + quarter_note + triplet_eighth_note + triplet_eighth_note)
- 	local quarter4 = newNote(true, quarter_note, 0 + quarter_note + quarter_note + triplet_eighth_note + triplet_eighth_note + triplet_eighth_note)
+ 	local quarter1 = newNote(true, gameButtons.button1, quarter_note, 0)
+ 	local quarter2 = newNote(true, gameButtons.button1, quarter_note, 0 + quarter_note)
+ 	local note3 = newNote(true, gameButtons.button2, triplet_eighth_note, 0 + quarter_note + quarter_note)
+ 	local note4 = newNote(true, gameButtons.button3, triplet_eighth_note, 0 + quarter_note + quarter_note + triplet_eighth_note)
+ 	local note5 = newNote(true, gameButtons.button4, triplet_eighth_note, 0 + quarter_note + quarter_note + triplet_eighth_note + triplet_eighth_note)
+ 	local quarter4 = newNote(true, gameButtons.button1, quarter_note, 0 + quarter_note + quarter_note + triplet_eighth_note + triplet_eighth_note + triplet_eighth_note)
 
  	--local quarter3 = newNote(true, quarter_note, 0 + quarter_note + quarter_note)
  	--local quarter4 = newNote(true, quarter_note, 0 + quarter_note + quarter_note + quarter_note)
@@ -105,9 +105,17 @@ end
 
 end 
 
--- press is an array of buttons to press
-function newNote(_play, _duration, _songPosition, _press)
-	return {play = _play, duration = _duration, songPosition = _songPosition, press = _press, hit = false, missed = false}
+-- play = true -> a note
+-- play = false -> a rest
+-- button to press indicates which button to press but also tells which track it will appear on
+function newNote(_play, _buttonToPress, _duration, _songPosition)
+	return {
+	play = _play, 
+	duration = _duration, 
+	songPosition = _songPosition,
+	buttonToPress = _buttonToPress, 
+	hit = false, 
+	missed = false}
 end 
 
 
@@ -124,7 +132,6 @@ function addBeatmapBar(newBar)
 	if barCount > barLength or barCount < barLength then 
 		return false 
 	end 
-
 
 	-- if the bar adds up to the proper amount then add it to the beatmap
 	table.insert(beatmap, newBar)
@@ -147,13 +154,13 @@ function updateAudioManager()
 	if currentSong:tell("seconds") ~= lastReportedSongPosition then 
 		songTime = (songTime + (currentSong:tell("seconds") * 1000)) * 0.5
 		lastReportedSongPosition = currentSong:tell("seconds") * 1000
-	end 
-
+	end
 
 	-- 4 16th notes in a beat, 4 beats in a bar
 	previousBar = bar 
 	bar = songTime / sixteenth_note * (1 / 16)
 
+	-- currently these are both only used for debug purposes
 	-- where you are in the bar - the current bar (int)
 	sixteenthBeat = (songTime / sixteenth_note) - (math.floor(bar) * 16)
 	sixteenthTripletBeat = (songTime / triplet_sixteenth_note) - (math.floor(bar) * 24)
@@ -188,6 +195,7 @@ end
 function getSixteenthTripletBeatInCurrentBar()
 	return sixteenthTripletBeat
 end ]]
+
 
 -- very erratic
 -- go through this https://github.com/vrld/slam/blob/master/slam.lua
