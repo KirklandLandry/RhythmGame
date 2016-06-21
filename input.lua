@@ -1,5 +1,12 @@
 keys = {}
 
+
+gameButtons = {}
+gameButtons.button1 = "a"
+gameButtons.button2 = "s"
+gameButtons.button3 = "d"
+gameButtons.button4 = "f"
+
 function love.keypressed(key)
     if key == "escape" then
         love.event.quit()
@@ -27,8 +34,10 @@ function love.keyreleased(key)
 end
 
 function initKeys()
-    keys['d'] = {down = false, time = 0}
+    keys[gameButtons.button3] = {down = false, time = 0}
 end 
+
+
 
 --[[input = {}
 input.mouseDown = false

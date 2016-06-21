@@ -55,7 +55,7 @@ function initAudioManager(songPath)
 	triplet_eighth_note     =   (20 / bpm) * 1000 -- 3 triplet eighth notes = 1 quarter note
 	triplet_sixteenth_note  =   (10 / bpm) * 1000 -- 6 triplet 16th notes = 1 quarter note
 
-	initSources()
+	initHitSfxTable()
 	initBeatmap()
 end 
 
@@ -69,9 +69,13 @@ function initBeatmap()
 	-- this is the length of a single bar in ms
 	barLength = quarter_note * 4
 
+	emptyBar = {}
+	table.insert(emptyBar, newNote(false, quarter_note * 4, 0))
+	addBeatmapBar(emptyBar)
+
 for i=1,10 do
 		-- fill a bar with values
-	newBar = {}
+	local newBar = {}
  	local quarter1 = newNote(true, quarter_note, 0)
  	local quarter2 = newNote(true, quarter_note, 0 + quarter_note)
  	local note3 = newNote(true, triplet_eighth_note, 0 + quarter_note + quarter_note)
@@ -101,9 +105,11 @@ end
 
 end 
 
-function newNote(_play, _duration, _position)
-	return {play = _play, duration = _duration, position = _position, y = 0}
+-- press is an array of buttons to press
+function newNote(_play, _duration, _songPosition, _press)
+	return {play = _play, duration = _duration, songPosition = _songPosition, press = _press, hit = false, missed = false}
 end 
+
 
 function addBeatmapBar(newBar)
 	local barCount = 0
@@ -114,7 +120,7 @@ function addBeatmapBar(newBar)
 	-- a bar must add up to the barLength
 	-- ie 4 quarter notes = 1 bar
 	-- 2 half notes = 1 bar
-	-- 3 quarter notes does not equal 1 bar
+	-- 3 quarter notes ~= 1 bar
 	if barCount > barLength or barCount < barLength then 
 		return false 
 	end 
@@ -126,7 +132,8 @@ function addBeatmapBar(newBar)
 	return true
 end
 
-
+-- credit to the reddit for helping me get it 
+-- https://www.reddit.com/r/gamedev/comments/13y26t/how_do_rhythm_games_stay_in_sync_with_the_music/
 function updateAudioManager()
 	if previousFrameTime == 0 then 
 		currentSong:play()
@@ -174,38 +181,38 @@ function getBarLength()
 	return barLength
 end 
 
-function getSixteenthBeatInCurrentBar()
+--[[function getSixteenthBeatInCurrentBar()
 	return sixteenthBeat
 end 
 
 function getSixteenthTripletBeatInCurrentBar()
 	return sixteenthTripletBeat
-end 
+end ]]
 
 -- very erratic
 -- go through this https://github.com/vrld/slam/blob/master/slam.lua
 -- and this https://love2d.org/forums/viewtopic.php?t=2220
-local sources = {}
-function initSources()
+local hitSfxTable = {}
+function initHitSfxTable()
 	for i=1,10 do
-		table.insert(sources, love.audio.newSource("assets/blip.wav", "static"))
-		sources[i]:setLooping(false)
+		table.insert(hitSfxTable, love.audio.newSource("assets/blip.wav", "static"))
+		hitSfxTable[i]:setLooping(false)
 	end
 end 
 -- keep track of current source with a current var
 function playSfx()
 	local sfxPlayed = false
-	for i=1,#sources do
-		if sources[i]:isStopped() then 
-			sources[i]:play()
+	for i=1,#hitSfxTable do
+		if hitSfxTable[i]:isStopped() then 
+			hitSfxTable[i]:play()
 			sfxPlayed = true
 			break
 		end 
 	end
 	if not sfxPlayed then 
-		table.insert(sources, love.audio.newSource("assets/blip.wav", "static"))
-		sources[#sources]:setLooping(false)
-		sources[#sources]:play()
+		table.insert(hitSfxTable, love.audio.newSource("assets/blip.wav", "static"))
+		hitSfxTable[#hitSfxTable]:setLooping(false)
+		hitSfxTable[#hitSfxTable]:play()
 	end 
 end 
 
@@ -219,7 +226,7 @@ function audioManagerDebugPrint()
 	--print(sixteenthTripletBeat)
 
 
-	for i=1,#sources do
-		love.graphics.print("sfx"..tostring(i)..": "..tostring(sources[i]:isPlaying()), 10, 40 + (10 * i))
+	for i=1,#hitSfxTable do
+		love.graphics.print("sfx"..tostring(i)..": "..tostring(hitSfxTable[i]:isPlaying()), 10, 40 + (10 * i))
 	end
 end 
