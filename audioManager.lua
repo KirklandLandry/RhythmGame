@@ -1,8 +1,4 @@
 
-
-local src1 = love.audio.newSource("assets/blip.wav", "static")
-
-
 local currentSong = nil 
 
 local bpm = 0
@@ -22,7 +18,8 @@ local triplet_sixteenth_note  = 0
 
 local songTime = 0
 
-local bar = 0
+-- in the code, bar starts at bar 0.
+local currentBar = 0
 local previousBar = 0
 
 local lastReportedSongPosition = 0
@@ -32,18 +29,18 @@ local sixteenthBeat = 0
 local sixteenthTripletBeat = 0
 
 
-function initAudioManager(songPath)
-	currentSong = love.audio.newSource(songPath)--"assets/testSong.wav")
+function audioManagerInit(songPath, _bpm)
+	currentSong = love.audio.newSource(songPath)
 	currentSong:setVolume(0.7)
 
 	-- DEFINING CONSTANT VALUES -- 
 	-- beats per minute
-	bpm = 130
+	bpm = _bpm
 	-- beats per second
 	bps = bpm / 60
 	-- beats per millisecond
 	bpms = bps / 1000
-	-- note values in ms
+	-- note values in ms (www.)
 	half_note               =  (120 / bpm) * 1000 -- 1 half note = 2 quarter notes
 	quarter_note            =   (60 / bpm) * 1000 -- 1 quarter note = 1/4 of a bar
 	eighth_note             =   (30 / bpm) * 1000 -- 2 eighth notes = 1 quarter note
@@ -100,6 +97,8 @@ for i=1,10 do
 		print("success")
 	else -- bar wasn't added sucessfully
 		print("fail")
+		-- debug, obviously remove later
+		love.event.quit()
 	end  
 end
 
@@ -142,12 +141,14 @@ end
 -- credit to the reddit for helping me get it 
 -- https://www.reddit.com/r/gamedev/comments/13y26t/how_do_rhythm_games_stay_in_sync_with_the_music/
 function updateAudioManager()
+	-- if this is the first update (get rid of this later, song play should be started elsewhere)
 	if previousFrameTime == 0 then 
 		currentSong:play()
 		songTime = 0
 	else
 		songTime = songTime + (love.timer.getTime()*1000) - previousFrameTime
 	end 
+
 	previousFrameTime = love.timer.getTime() * 1000
 
 	-- easing function for if the playhead position doesn't match the actual song position
@@ -157,27 +158,29 @@ function updateAudioManager()
 	end
 
 	-- 4 16th notes in a beat, 4 beats in a bar
-	previousBar = bar 
-	bar = songTime / sixteenth_note * (1 / 16)
+	previousBar = currentBar 
+	currentBar = songTime / sixteenth_note * (1 / 16)
 
 	-- currently these are both only used for debug purposes
 	-- where you are in the bar - the current bar (int)
-	sixteenthBeat = (songTime / sixteenth_note) - (math.floor(bar) * 16)
-	sixteenthTripletBeat = (songTime / triplet_sixteenth_note) - (math.floor(bar) * 24)
+	sixteenthBeat = (songTime / sixteenth_note) - (math.floor(currentBar) * 16)
+	sixteenthTripletBeat = (songTime / triplet_sixteenth_note) - (math.floor(currentBar) * 24)
 
 	return songTime
 end 
 
+
+-- only used in input to time button presses
 function getSongTime()
 	return songTime + (love.timer.getTime()*1000) - previousFrameTime
 end
 
 function getCurrentBar()
-	return math.floor(bar)
+	return math.floor(currentBar)
 end 
 
 function getCurrentTimePositionInBar()
-	return ((bar - math.floor(bar)) * barLength) 
+	return ((currentBar - math.floor(currentBar)) * barLength) 
 end 
 
 function getPreviousBar()
@@ -228,11 +231,9 @@ end
 
 function audioManagerDebugPrint()
 	love.graphics.print("songTime: "..tostring(songTime), 10, 0)
-	love.graphics.print("bar:           "..tostring(bar), 10, 10)
+	love.graphics.print("bar:           "..tostring(currentBar), 10, 10)
 	love.graphics.print("16th beat:           "..tostring(sixteenthBeat), 10, 20)
 	love.graphics.print("16th triplet beat: "..tostring(sixteenthTripletBeat), 10, 30)
-	--print(sixteenthTripletBeat)
-
 
 	for i=1,#hitSfxTable do
 		love.graphics.print("sfx"..tostring(i)..": "..tostring(hitSfxTable[i]:isPlaying()), 10, 40 + (10 * i))
