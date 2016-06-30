@@ -3,13 +3,15 @@ local globalRunning = false
 -- the +- allowance to hit a note
 -- should change it so that + and - are different.
 -- there should be a longer Pre allowance than post allowance
-local offs = 35
+local offs = 22
 
 
 function gameUpdate(dt)
-	if keys['d'].down then 
+	if keyIsDown(gameButtons.button1) then 
 		globalRunning = true 
 	end 
+
+
 
 	if globalRunning then 
 
@@ -30,8 +32,8 @@ function gameUpdate(dt)
 					
 					local currentButtonToPress = beatmap[currentBar][i].buttonToPress
 					print(currentButtonToPress)
-					if keys[currentButtonToPress].down and keys[currentButtonToPress].time >= (currentBarInMs + noteToHit - (offs* 2)) and 
-						keys[currentButtonToPress].time  <= (currentBarInMs + noteToHit + (offs* 2)) and 
+					if keyIsDown(currentButtonToPress) and getKeyTime(currentButtonToPress) >= (currentBarInMs + noteToHit - (offs* 2)) and 
+						getKeyTime(currentButtonToPress)  <= (currentBarInMs + noteToHit + (offs* 2)) and 
 						beatmap[currentBar][i].hit == false then 
 
 						print("hit")

@@ -7,7 +7,7 @@ require "extraMathFunctions"
 DEBUG_MODE = true 
 -- wrap any debug code around it so it can be turned on / off easily
 
--- IMPORTANT --
+-- NOTES --
 -- go through the callbacks and implement them
 -- input should be replaced with callbacks AND the exact time the button was pressed
 -- implement the hasfocus and quit callbacks
@@ -26,10 +26,13 @@ DEBUG_MODE = true
 -- pause
 -- volume
 
+-- use a stack for showing menu screens
+
 -- okay, so here's an idea for changing up input.
 -- you have 4 tracks of input. when adding a bar, you have to add input for all 4 tracks
 -- you specify track, time to press down, time to release 
 -- or maybe you specify if it's updown (press), up, or down
+-- so up, down. up and down == press, up == release, down == press, neither = rest
 -- for each track you keep track of the press and release times
 -- 
 

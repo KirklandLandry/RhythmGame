@@ -40,7 +40,7 @@ function audioManagerInit(songPath, _bpm)
 	bps = bpm / 60
 	-- beats per millisecond
 	bpms = bps / 1000
-	-- note values in ms (www.)
+	-- note values in ms (http://bradthemad.org/guitar/tempo_explanation.php)
 	half_note               =  (120 / bpm) * 1000 -- 1 half note = 2 quarter notes
 	quarter_note            =   (60 / bpm) * 1000 -- 1 quarter note = 1/4 of a bar
 	eighth_note             =   (30 / bpm) * 1000 -- 2 eighth notes = 1 quarter note
