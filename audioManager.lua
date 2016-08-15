@@ -30,6 +30,7 @@ local sixteenthTripletBeat = 0
 
 
 function audioManagerInit(songPath, _bpm)
+	if not love.filesystem.exists(songPath) then error("song missing or path incorrect.") end 
 	currentSong = love.audio.newSource(songPath)
 	currentSong:setVolume(0.7)
 

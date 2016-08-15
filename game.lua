@@ -3,7 +3,7 @@ local globalRunning = false
 -- the +- allowance to hit a note
 -- should change it so that + and - are different.
 -- there should be a longer Pre allowance than post allowance
-local offs = 22
+local offs = 30
 
 
 function gameUpdate(dt)
