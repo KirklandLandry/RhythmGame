@@ -68,51 +68,51 @@ function initBeatmap()
 	barLength = quarter_note * 4
 
 	emptyBar = {}
-	table.insert(emptyBar, newNote(false, gameButtons.button1, quarter_note * 4, 0))
+	table.insert(emptyBar, newNote(false, btns.one, quarter_note * 4, 0))
 	addBeatmapBar(emptyBar)
 
-for i=1,10 do
-		-- fill a bar with values
-	local newBar = {}
- 	local quarter1 = newNote(true, gameButtons.button1, quarter_note, 0)
- 	local quarter2 = newNote(true, gameButtons.button1, quarter_note, 0 + quarter_note)
- 	local note3 = newNote(true, gameButtons.button2, triplet_eighth_note, 0 + quarter_note + quarter_note)
- 	local note4 = newNote(true, gameButtons.button3, triplet_eighth_note, 0 + quarter_note + quarter_note + triplet_eighth_note)
- 	local note5 = newNote(true, gameButtons.button4, triplet_eighth_note, 0 + quarter_note + quarter_note + triplet_eighth_note + triplet_eighth_note)
- 	local quarter4 = newNote(true, gameButtons.button1, quarter_note, 0 + quarter_note + quarter_note + triplet_eighth_note + triplet_eighth_note + triplet_eighth_note)
+	for i=1,10 do
+			-- fill a bar with values
+		local newBar = {}
+		local quarter1 = newNote(true, btns.one, quarter_note, 0)
+		local quarter2 = newNote(false, btns.one, quarter_note, 0 + quarter_note)
+		local note3 = newNote(true, btns.two, triplet_eighth_note, 0 + quarter_note + quarter_note)
+		local note4 = newNote(true, btns.three, triplet_eighth_note, 0 + quarter_note + quarter_note + triplet_eighth_note)
+		local note5 = newNote(true, btns.four, triplet_eighth_note, 0 + quarter_note + quarter_note + triplet_eighth_note + triplet_eighth_note)
+		local quarter4 = newNote(true, btns.one, quarter_note, 0 + quarter_note + quarter_note + triplet_eighth_note + triplet_eighth_note + triplet_eighth_note)
 
- 	--local quarter3 = newNote(true, quarter_note, 0 + quarter_note + quarter_note)
- 	--local quarter4 = newNote(true, quarter_note, 0 + quarter_note + quarter_note + quarter_note)
+		--local quarter3 = newNote(true, quarter_note, 0 + quarter_note + quarter_note)
+		--local quarter4 = newNote(true, quarter_note, 0 + quarter_note + quarter_note + quarter_note)
 
-	table.insert(newBar, quarter1)
-	table.insert(newBar, quarter2)
-	--table.insert(newBar, quarter3)
-	table.insert(newBar, note3)
-	table.insert(newBar, note4)
-	table.insert(newBar, note5)
+		table.insert(newBar, quarter1)
+		table.insert(newBar, quarter2)
+		--table.insert(newBar, quarter3)
+		table.insert(newBar, note3)
+		table.insert(newBar, note4)
+		table.insert(newBar, note5)
 
-	table.insert(newBar, quarter4)
+		table.insert(newBar, quarter4)
 
-	-- the new bar was sucessfully created
-	if addBeatmapBar(newBar) then 
-		print("success")
-	else -- bar wasn't added sucessfully
-		print("fail")
-		-- debug, obviously remove later
-		love.event.quit()
-	end  
-end
+		-- the new bar was sucessfully created
+		if addBeatmapBar(newBar) then 
+			print("success. bar "..tostring(i).." inserted")
+		else -- bar wasn't added sucessfully
+			print("fail")
+			-- debug, obviously remove later
+			love.event.quit()
+		end  
+	end
 
 end 
 
 -- play = true -> a note
 -- play = false -> a rest
 -- button to press indicates which button to press but also tells which track it will appear on
-function newNote(_play, _buttonToPress, _duration, _songPosition)
+function newNote(_play, _buttonToPress, _duration, _barPosition)
 	return {
 	play = _play, 
 	duration = _duration, 
-	songPosition = _songPosition,
+	barPosition = _barPosition,
 	buttonToPress = _buttonToPress, 
 	hit = false, 
 	missed = false}
@@ -159,7 +159,7 @@ function updateAudioManager()
 	end
 
 	-- 4 16th notes in a beat, 4 beats in a bar
-	previousBar = currentBar 
+	--previousBar = currentBar 
 	currentBar = songTime / sixteenth_note * (1 / 16)
 
 	-- currently these are both only used for debug purposes
@@ -173,20 +173,20 @@ end
 
 -- only used in input to time button presses
 function getSongTime()
-	return songTime + (love.timer.getTime()*1000) - previousFrameTime
+	return songTime + ((love.timer.getTime()*1000) - previousFrameTime)
 end
 
 function getCurrentBar()
-	return math.floor(currentBar)
+	return math.floor(currentBar) 
 end 
 
 function getCurrentTimePositionInBar()
 	return ((currentBar - math.floor(currentBar)) * barLength) 
 end 
 
-function getPreviousBar()
+--[[function getPreviousBar()
 	return math.floor(previousBar)
-end 
+end ]]
 
 function getBarLength()
 	return barLength
